@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Scrumpoker/handler"
-	"Scrumpoker/models"
 	"context"
+	"internal/handler"
+	"internal/models"
 
 	"flag"
 	"fmt"
@@ -64,7 +64,7 @@ func main() {
 	var cleanupInterval time.Duration
 	var maxSessionLifetime time.Duration
 
-	flag.StringVar(&dir, "dir", "static", "the directory to serve files from. Defaults to the current dir")
+	flag.StringVar(&dir, "dir", "./web/static/", "the directory to serve files from. Defaults to the current dir")
 	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 	flag.DurationVar(&cleanupInterval, "cleanup-timeout", time.Minute*15, "the interval in which we chek that a Session is active (if not remove it from the manager)")
 	flag.DurationVar(&maxSessionLifetime, "max-session-lifetime", time.Minute*60, "How lomg a Session can stay inactive")
@@ -76,9 +76,10 @@ func main() {
 		manager:           sessionManager,
 		ScrumpokerSession: &spSession,
 	}
+	//pw := printware{}
 
 	r := mux.NewRouter()
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
+	r.PathPrefix("/static").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
 	// HTML-Pages Serving Endpoints
 	r.HandleFunc("/", handler.HomePage).Methods("GET", "INDEX", "VIEW")
@@ -144,10 +145,11 @@ func main() {
 
 	ticker.Stop()
 	tickerChanel <- true
+	fmt.Println("Cleanup Timer stopped")
 
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.
-	log.Println("shutting down")
+	fmt.Println("shutting down")
 	os.Exit(0)
 }
