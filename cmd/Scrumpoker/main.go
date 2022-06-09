@@ -2,59 +2,19 @@ package main
 
 import (
 	"context"
-	"internal/handler"
-	"internal/models"
-
 	"flag"
 	"fmt"
+	"internal/handler"
+	"internal/models"
+	"internal/util"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-
 	"time"
 
 	"github.com/gorilla/mux"
 )
-
-type authenticationMiddleware struct {
-	manager           *models.SessionManager
-	ScrumpokerSession *handler.ScrumpokerSession
-}
-
-func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		uuid := ""
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			c, err := r.Cookie(handler.Uuid_token)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			uuid = c.Value
-		} else {
-			uuid = authHeader[len("Bearer "):]
-		}
-
-		session, err := amw.manager.GetSession(mux.Vars(r)["id"])
-		if err != nil {
-			handler.RedirectToMainandDisplayError(err.Error(), &w, r)
-			return
-		}
-
-		user, err := session.GetUser(uuid)
-		if err != nil {
-			handler.RedirectToMainandDisplayError(err.Error(), &w, r)
-			return
-		}
-
-		amw.ScrumpokerSession.Session = session
-		amw.ScrumpokerSession.User = user
-		amw.ScrumpokerSession.Uuid = uuid
-		next.ServeHTTP(w, r)
-	})
-}
 
 func main() {
 	fmt.Println("Scrumpoker REST API Testserver Init")
@@ -72,11 +32,10 @@ func main() {
 
 	sessionManager := models.InitilaizeManager(maxSessionLifetime)
 	spSession := handler.ScrumpokerSession{}
-	amw := authenticationMiddleware{
-		manager:           sessionManager,
+	amw := util.AuthenticationMiddleware{
+		Manager:           sessionManager,
 		ScrumpokerSession: &spSession,
 	}
-	//pw := printware{}
 
 	r := mux.NewRouter()
 	r.PathPrefix("/static").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
@@ -99,7 +58,7 @@ func main() {
 	scrumpokerRouter.HandleFunc("/{id}/reset", spSession.ResetSession(sessionManager)).Methods("GET")
 
 	srv := &http.Server{
-		Addr:         ":10000",
+		Addr:         "127.0.0.1:10000",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -113,6 +72,7 @@ func main() {
 			log.Println(err)
 		}
 	}()
+	fmt.Printf("Address: \n\thttp://%s\n", srv.Addr)
 
 	fmt.Println("Cleanup Timer started")
 	ticker := time.NewTicker(cleanupInterval)
@@ -133,6 +93,7 @@ func main() {
 	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
 	signal.Notify(c, os.Interrupt)
 
+	fmt.Println("Scrumpoker Server Interrupt Chanel started")
 	// Block until we receive our signal.
 	<-c
 
@@ -145,7 +106,7 @@ func main() {
 
 	ticker.Stop()
 	tickerChanel <- true
-	fmt.Println("Cleanup Timer stopped")
+	fmt.Println("\nCleanup Timer stopped")
 
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services

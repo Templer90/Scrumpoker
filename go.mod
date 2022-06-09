@@ -11,3 +11,7 @@ replace internal/handler => ./internal/pkg/handler
 require internal/models v1.0.0
 
 replace internal/models => ./internal/pkg/models
+
+require internal/util v1.0.0
+
+replace internal/util => ./internal/pkg/util

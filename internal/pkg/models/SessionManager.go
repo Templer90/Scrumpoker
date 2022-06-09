@@ -7,16 +7,6 @@ import (
 	"time"
 )
 
-type sessionData struct {
-	Session     *ScrumpokerSession
-	LastUpdated time.Time
-}
-
-type SessionManager struct {
-	sessions           map[string]sessionData
-	maxSessionLifetime time.Duration
-}
-
 // Note - NOT RFC4122 compliant
 func genUuid() (uuid string) {
 	b := make([]byte, 16)
@@ -27,6 +17,16 @@ func genUuid() (uuid string) {
 	}
 
 	return fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+}
+
+type sessionData struct {
+	Session     *ScrumpokerSession
+	LastUpdated time.Time
+}
+
+type SessionManager struct {
+	sessions           map[string]sessionData
+	maxSessionLifetime time.Duration
 }
 
 func InitilaizeManager(maxSessionLifetime time.Duration) *SessionManager {
