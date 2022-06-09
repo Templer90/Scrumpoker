@@ -1,0 +1,56 @@
+<html class="h-100" lang="en">
+
+<head>
+    <title>{{.Title}} for {{.SessionID}}</title>
+
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <body class="d-flex flex-column h-100">
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <div class="headder">
+                    <section>
+                        <h3>Scrumpoker for</h3>
+                        <h3>{{.SessionID}}</h3>
+                        Hello {{.Username}}
+                        <br>
+                        {{if .IsAdmin}}
+                        <div class="admin">
+                            <button onclick="administer()">Toggle Cards</button>
+                            <button onclick="resetSession()">Reset Votes</button>
+                            <button onclick="deleteSession()">Delete Session</button>
+                        </div>
+                        {{end}}
+                    </section>
+                </div>
+
+                <section>
+                    <div class="card-form">
+                        {{range .CardsArray}}
+                        <button class="inline" onclick="submitVote('{{.}}')">{{.}}</button>
+                        {{end}}
+                    </div>
+                </section>
+
+                <section>
+                    <h4>Results</h4>
+                    <div id="voteResults" class="voteResults">
+                </section>
+        </main>
+        </div>
+        </div>
+    </body>
+
+    <script>
+        const SessionID = "{{.SessionID}}";
+        const BearerToken = "{{.Bearer}}";
+        const votePullInterval = {{.Intervall}};
+    
+    </script>
+    <script src="/static/js/main.js"></script>
+
+</html>

@@ -1,0 +1,53 @@
+<html class="h-100" lang="en">
+
+<head>
+    <title>{{.Title}}</title>
+
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="d-flex flex-column h-100">
+    <main role="main" class="flex-shrink-0">
+        <div class="container">
+            <div class="text-center">
+                
+                <section class="contact-form">
+                    <h3>Join Session</h3>
+                    <form action="/join" method="post">
+                        <div class="input-group">
+                            <label for="Username">Username</label>
+                            <input id="Username" name="Username" type="text"/>
+                        </div>
+                        <div class="input-group">
+                            <label for="SessionID">Session ID</label>
+                            <input id="SessionID" name="SessionID" type="text"/>
+                        </div>
+                        <input type="submit" value="Join">
+                    </form>
+                </section>
+
+                <section class="contact-form">
+                    <h3>Create Session</h3>
+                    <form action="/create" method="post">
+                        <div class="input-group">
+                            <label for="Username">Username</label>
+                            <input id="Username" name="Username" type="text"/>
+                        </div>
+                        <div class="input-group">
+                            <label for="Cards">Cards</label>
+                            <input id="Cards" name="Cards" value="1,2,3,5,8,13" type="text"/>
+                        </div>
+                        <input type="submit" value="Create">
+                    </form>
+                </section>
+
+                {{ if ne .Error "" }}
+                <div class="error">{{.Error}}</div>
+                {{end}}
+    </main>
+    </div>
+    </div>
+</body>
+
+</html>
