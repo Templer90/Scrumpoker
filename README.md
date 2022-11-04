@@ -1,8 +1,8 @@
 # Golang Application for Scrumpoker
 
-This is smal example application/server for Scrumpoker.
+This is small example application/server for Scrumpoker.
 
-It conatins a few (well...2) websites and a small api for participating and admininstrating Scrumpokersessions.
+It contains a few (well...2) websites and a small api for participating and admininstrating Scrumpokersessions.
 
 Build with  
 `go build ./cmd/Scrumpoker`
